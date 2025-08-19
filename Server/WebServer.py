@@ -92,7 +92,6 @@ def ap_thread():
 
 
 def functionSelect(command_input, response):
-    global functionMode
     if 'scan' == command_input:
         if OLED_connection:
             screen.screen_show(5,'SCANNING')
@@ -114,20 +113,17 @@ def functionSelect(command_input, response):
         flask_app.modeselect('watchDog')
 
     elif 'stopCV' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         flask_app.modeselect('none')
         switch.switch(1,0)
         switch.switch(2,0)
         switch.switch(3,0)
         move.motorStop()
 
-    elif 'KD' == command_input:
-        if OLED_connection:
-            screen.screen_show(5,'POLICE')
-        servoPosInit()
-        fuc.keepDistance()
-        ws2812.police()
-    
     elif 'automaticOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         ws2812.pause()
         fuc.pause()
         move.motorStop()
@@ -142,18 +138,15 @@ def functionSelect(command_input, response):
         else:
             fuc.pause()
 
-    elif 'automaticOff' == command_input:
-        fuc.pause()
-        move.motorStop()
-        time.sleep(0.2)
-        move.motorStop()
-
     elif 'trackLine' == command_input:
+        functions.last_status = None
         fuc.trackLine()
         if OLED_connection:
             screen.screen_show(5,'TrackLine')
 
     elif 'trackLineOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         fuc.pause()
         move.motorStop()
 
@@ -163,23 +156,48 @@ def functionSelect(command_input, response):
         fuc.steady(scGear.lastPos[2])
 
     elif 'steadyCameraOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         fuc.pause()
         move.motorStop()
 
     elif 'police' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'POLICE')
         ws2812.police()
         pass
 
     elif 'policeOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         ws2812.breath(75,85,90)
         pass
+    
     elif 'speech' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'SPEECH')
         SR.speech()
         pass
 
     elif 'speechOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         SR.pause()
         pass
+    
+    elif 'keepDistance' == command_input:
+        functions.last_status = 25
+        fuc.keepDistance()
+        if OLED_connection:
+            screen.screen_show(5,'KeepDistance')
+
+    elif 'keepDistanceOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
+        fuc.pause()
+        move.motorStop()
+        time.sleep(0.5)
+        move.motorStop()
 
 def switchCtrl(command_input, response):
     if 'Switch_1_on' in command_input:
@@ -488,9 +506,6 @@ async def recv_msg(websocket):
                 color = data['data']
                 flask_app.colorFindSet(color[0],color[1],color[2])
 
-        if not functionMode:
-            if OLED_connection:
-                screen.screen_show(5,'Functions OFF')
         else:
             pass
         print(data)

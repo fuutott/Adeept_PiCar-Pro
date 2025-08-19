@@ -81,9 +81,9 @@ class Functions(threading.Thread):
 
 	def setup(self):
 		global track_line_left, track_line_middle,track_line_right
-		track_line_left = InputDevice(pin=line_pin_right)
+		track_line_left = InputDevice(pin=line_pin_left)
 		track_line_middle = InputDevice(pin=line_pin_middle)
-		track_line_right = InputDevice(pin=line_pin_left)
+		track_line_right = InputDevice(pin=line_pin_right)
 
 	def radarScan(self):
 		pwm0_min = -90
@@ -140,29 +140,37 @@ class Functions(threading.Thread):
 		self.resume()
 
 	def trackLineProcessing(self):
+		global last_status
+     
 		status_right = track_line_right.value
 		status_middle = track_line_middle.value
 		status_left = track_line_left.value
-		if status_middle == 0:
-			if status_left == 0 and status_right == 1:
+		current_status = (status_left << 2) | (status_middle << 1) | status_right
 
-				scGear.set_angle(0, 30 * Dv - Angular_deviation + 90)
+		if last_status == current_status:
+			return
+
+		last_status = current_status
+		if status_middle == 0:
+			if status_left == 0 and status_right == 1:    # 0 0 1   right
+				scGear.moveAngle(0, -30 * Dv)
+				move.move(25,1,"right")
+			elif status_left == 1 and status_right == 0:  # 1 0 0 left
+				scGear.moveAngle(0, 30 * Dv)
 				move.move(25,1,"left")
-			elif status_left == 1 and status_right == 0:
-				scGear.set_angle(0, -30 * Dv - Angular_deviation + 90)
-				move.move(25,1,"left")
-			else:
-				scGear.set_angle(0, 90 - Angular_deviation)
+			else:									 # 0 0 0 or 1 0 1
+				scGear.moveAngle(0, Angular_deviation* Dv)  
 				move.move(25,1,"mid")
-		elif status_left == 0:
-			scGear.set_angle(0,30 * Dv - Angular_deviation + 90)
-			move.move(25,1,"left")
-		elif status_right == 0:
-			scGear.set_angle(0, -30 * Dv - Angular_deviation + 90)
-			move.move(25,1,"left")
 		else:
-			scGear.set_angle(0,90 - Angular_deviation)
-			move.move(25,1,"no")
+			if status_left == 0 and status_right == 1:	#011
+				scGear.moveAngle(0, -30 * Dv)
+				move.move(25,1,"right")
+			elif status_left == 1 and status_right == 0:	#110
+				scGear.moveAngle(0, 30 * Dv)
+				move.move(25,1,"left")
+			else:	#010 or 111
+				scGear.moveAngle(0, Angular_deviation* Dv)
+				move.move(25,1,"mid")
 		print(status_left,status_middle,status_right)
 		time.sleep(0.1)
 
@@ -182,11 +190,11 @@ class Functions(threading.Thread):
 		scGear.moveAngle(1, 0)
 		dist = self.distRedress()
 		time.sleep(0.2)
-		if dist >= 40:
+		if dist >= 70:
 			scGear.moveAngle(0, 0)
 			time.sleep(0.2)
 			move.move(35, 1, "mid")
-		elif dist > 20 and dist < 40:	
+		elif dist > 40 and dist < 70:	
 			scGear.moveAngle(1, 30)
 			move.move(0, 1, "mid")
 			time.sleep(0.3)
@@ -213,13 +221,18 @@ class Functions(threading.Thread):
 			time.sleep(1)
 
 	def keepDisProcessing(self):
-		distanceGet = ultra.checkdist()
-		if distanceGet > (self.rangeKeep/2+0.1):
-			move.move(80, 1, "mid")
-		elif distanceGet < (self.rangeKeep/2-0.1):
-			move.move(80, -1, "mid")
-		else:
+		global last_status
+
+		distanceGet = self.distRedress()
+		if distanceGet > 40 and last_status < 40:
+			move.move(25, 1, "mid")
+			last_status = distanceGet
+		elif distanceGet < 25 and last_status > 25:
+			move.move(25, -1, "mid")
+			last_status = distanceGet
+		elif distanceGet >= 25 and distanceGet <= 40:
 			move.motorStop()
+			last_status = distanceGet
 
 
 	def functionGoing(self):

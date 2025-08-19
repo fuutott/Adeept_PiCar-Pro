@@ -126,16 +126,22 @@ def functionSelect(command_input, response):
             time.sleep(0.3)
 
     elif 'findColor' == command_input:
-            functionMode = 2
-            fpv.FindColor(1)
-            tcpCliSock.send(('FindColor').encode())
+        if OLED_connection:
+            screen.screen_show(5,'FindColor')
+        functionMode = 2
+        fpv.FindColor(1)
+        tcpCliSock.send(('FindColor').encode())
 
     elif 'motionGet' == command_input:
-            functionMode = 3
-            fpv.WatchDog(1)
-            tcpCliSock.send(('WatchDog').encode())
+        if OLED_connection:
+            screen.screen_show(5,'MotionGet')
+        functionMode = 3
+        fpv.WatchDog(1)
+        tcpCliSock.send(('WatchDog').encode())
 
     elif 'stopCV' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         fpv.FindColor(0)
         fpv.WatchDog(0)
         FPV.FindLineMode = 0
@@ -150,6 +156,8 @@ def functionSelect(command_input, response):
         ws2812.police()
 
     elif 'policeOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         ws2812.pause()
 
     elif 'automatic' == command_input:
@@ -161,23 +169,46 @@ def functionSelect(command_input, response):
             fuc.pause() 
 
     elif 'automaticOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         fuc.pause()
 
     elif 'trackLine' == command_input:
+        functions.last_status = None
         fuc.trackLine()
         if OLED_connection:
             screen.screen_show(5,'TrackLine')
 
     elif 'trackLineOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         fuc.pause()
 
     elif 'speech' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'Speed')
         SR.speech()
         pass
 
     elif 'speechOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
         SR.pause()
         pass
+    
+    elif 'keepDistance' == command_input:
+        functions.last_status = 25
+        fuc.keepDistance()
+        if OLED_connection:
+            screen.screen_show(5,'KeepDistance')
+
+    elif 'keepDistanceOff' == command_input:
+        if OLED_connection:
+            screen.screen_show(5,'FUNCTION OFF')
+        fuc.pause()
+        move.motorStop()
+        time.sleep(0.5)
+        move.motorStop()
 
 def switchCtrl(command_input):
     if 'Switch_1_on' in command_input:
@@ -494,11 +525,7 @@ def recv_msg(tcpCliSock):
                         print(f"color: r={r}, g={g}, b={b}")
                 except (SyntaxError, ValueError):
                     print("The received string format is incorrect and cannot be parsed.")
-                
 
-        if not functionMode:
-            if OLED_connection:
-                screen.screen_show(5,'Functions OFF')
         else:
             pass
         response = json.dumps(response)
