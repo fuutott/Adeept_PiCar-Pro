@@ -11,15 +11,15 @@ line_pin_left = 22
 line_pin_middle = 27
 line_pin_right = 17
 
-left = InputDevice(pin=line_pin_right)
+left = InputDevice(pin=line_pin_left)
 middle = InputDevice(pin=line_pin_middle)
-right = InputDevice(pin=line_pin_left)
+right = InputDevice(pin=line_pin_right)
 
 def run():
     status_right = right.value
     status_middle = middle.value
     status_left = left.value
-    print('left: %d   middle: %d   right: %d' %(status_right,status_middle,status_left))
+    print('left: %d   middle: %d   right: %d' %(status_left,status_middle,status_right))
 
 
 if __name__ == '__main__':
