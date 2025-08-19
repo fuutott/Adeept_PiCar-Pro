@@ -946,13 +946,23 @@ def function_buttons(x,y):
 			tcpClicSock.send(('speechOff').encode())
 			function_stu = 0
 
-	Btn_function_1 = tk.Button(root, width=8, text='RadarScan',fg=color_text,bg=color_btn,relief='ridge')
-	Btn_function_2 = tk.Button(root, width=8, text='FindColor',fg=color_text,bg=color_btn,relief='ridge')
-	Btn_function_3 = tk.Button(root, width=8, text='MotionGet',fg=color_text,bg=color_btn,relief='ridge')
-	Btn_function_4 = tk.Button(root, width=8, text='Police',fg=color_text,bg=color_btn,relief='ridge')
-	Btn_function_5 = tk.Button(root, width=8, text='Automatic',fg=color_text,bg=color_btn,relief='ridge')
-	Btn_function_6 = tk.Button(root, width=8, text='TrackLine',fg=color_text,bg=color_btn,relief='ridge')
-	Btn_function_7 = tk.Button(root, width=8, text='Speech',fg=color_text,bg=color_btn,relief='ridge')
+	def call_function_8(event):
+		global function_stu
+		if function_stu == 0:
+			tcpClicSock.send(('keepDistance').encode())
+			function_stu = 1
+		else:
+			tcpClicSock.send(('keepDistanceOff').encode())
+			function_stu = 0
+
+	Btn_function_1 = tk.Button(root, width=12, text='RadarScan',fg=color_text,bg=color_btn,relief='ridge')
+	Btn_function_2 = tk.Button(root, width=12, text='FindColor',fg=color_text,bg=color_btn,relief='ridge')
+	Btn_function_3 = tk.Button(root, width=12, text='MotionGet',fg=color_text,bg=color_btn,relief='ridge')
+	Btn_function_4 = tk.Button(root, width=12, text='Police',fg=color_text,bg=color_btn,relief='ridge')
+	Btn_function_5 = tk.Button(root, width=12, text='Automatic',fg=color_text,bg=color_btn,relief='ridge')
+	Btn_function_6 = tk.Button(root, width=12, text='TrackLine',fg=color_text,bg=color_btn,relief='ridge')
+	Btn_function_7 = tk.Button(root, width=12, text='Speech',fg=color_text,bg=color_btn,relief='ridge')
+	Btn_function_8 = tk.Button(root, width=12, text='KeepDistance',fg=color_text,bg=color_btn,relief='ridge')
 
 	Btn_function_1.place(x=x,y=y)
 	Btn_function_2.place(x=x,y=y+35)
@@ -961,6 +971,7 @@ def function_buttons(x,y):
 	Btn_function_5.place(x=x,y=y+140)
 	Btn_function_6.place(x=x,y=y+175)
 	Btn_function_7.place(x=x,y=y+210)
+	Btn_function_8.place(x=x,y=y+245)
 
 	Btn_function_1.bind('<ButtonPress-1>', call_function_1)
 	Btn_function_2.bind('<ButtonPress-1>', call_function_2)
@@ -969,6 +980,7 @@ def function_buttons(x,y):
 	Btn_function_5.bind('<ButtonPress-1>', call_function_5)
 	Btn_function_6.bind('<ButtonPress-1>', call_function_6)
 	Btn_function_7.bind('<ButtonPress-1>', call_function_7)
+	Btn_function_8.bind('<ButtonPress-1>', call_function_8)
 
 
 def config_buttons(x,y):
@@ -1082,7 +1094,7 @@ def loop():
 
 	ultrasonic_radar(30,290)
 
-	function_buttons(395,290)
+	function_buttons(367,290)
 
 	scale_FL(470,0,238)
 
