@@ -6,7 +6,6 @@
 import time
 import sys
 import subprocess
-from rpi_ws281x import *
 import threading
 import spidev
 import numpy
