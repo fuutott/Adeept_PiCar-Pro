@@ -6,7 +6,6 @@
 import time
 import sys
 from gpiozero import PWMOutputDevice as PWM
-from rpi_ws281x import *
 import threading
 import spidev
 import numpy

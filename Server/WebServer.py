@@ -19,6 +19,8 @@ import Voice_Command
 import json
 import app
 import Voltage
+import subprocess
+
 
 Dv = -1 #Directional variable
 OLED_connection = 1
@@ -348,67 +350,6 @@ def configPWM(command_input, response):
         for i in range(5):
             scGear.moveAngle(i, 0)
 
-
-def update_code():
-    # Update local to be consistent with remote
-    projectPath = thisPath[:-7]
-    with open(f'{projectPath}/config.json', 'r') as f1:
-        config = json.load(f1)
-        if not config['production']:
-            print('Update code')
-            if os.system(f'cd {projectPath} && sudo git fetch --all && sudo git reset --hard origin/master && sudo git pull') == 0:
-                print('Update successfully')
-                print('Restarting...')
-                os.system('sudo reboot')
-            
-def wifi_check():
-    try:
-        s =socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        s.connect(("1.1.1.1",80))
-        ipaddr_check=s.getsockname()[0]
-        s.close()
-        print(ipaddr_check)
-        if OLED_connection:
-            screen.screen_show(2, 'IP:'+ipaddr_check)
-            screen.screen_show(3, 'AP MODE OFF')
-    except Exception as e:
-        print("Failed to connect to the Wi-Fi. The AP mode will be enabled. " + str(e))
-        ap_threading=threading.Thread(target=ap_thread)   #Define a thread for data receiving
-        ap_threading.setDaemon(True)                          #'True' means it is a front thread,it would close when the mainloop() closes
-        ap_threading.start()                                  #Thread starts
-        if OLED_connection:
-            screen.screen_show(2, 'AP Starting 10%')
-        ws2812.set_all_led_color_data(0,16,50)
-        ws2812.show()
-        time.sleep(1)
-        if OLED_connection:
-            screen.screen_show(2, 'AP Starting 30%')
-        ws2812.set_all_led_color_data(0,16,100)
-        ws2812.show()
-        time.sleep(1)
-        if OLED_connection:
-            screen.screen_show(2, 'AP Starting 50%')
-        ws2812.set_all_led_color_data(0,16,150)
-        ws2812.show()
-        time.sleep(1)
-        if OLED_connection:
-            screen.screen_show(2, 'AP Starting 70%')
-        ws2812.set_all_led_color_data(0,16,200)
-        ws2812.show()
-        time.sleep(1)
-        if OLED_connection:
-            screen.screen_show(2, 'AP Starting 90%')
-        ws2812.set_all_led_color_data(0,16,255)
-        ws2812.show()
-        time.sleep(1)
-        if OLED_connection:
-            screen.screen_show(2, 'AP Starting 100%')
-        ws2812.set_all_led_color_data(35,255,35)
-        ws2812.show()
-        if OLED_connection:
-            screen.screen_show(2, 'IP:192.168.12.1')
-            screen.screen_show(3, 'AP MODE ON')
-
 async def check_permit(websocket):
     while True:
         recv_str = await websocket.recv()
@@ -516,9 +457,43 @@ async def main_logic(websocket, path):
     await check_permit(websocket)
     await recv_msg(websocket)
 
+def show_wlan0_ip():
+    try:
+        if OLED_connection:
+            result = subprocess.run(
+                "ifconfig wlan0 | grep 'inet ' | awk '{print $2}'",
+                shell=True,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                encoding='utf-8'
+            ) 
+            screen.screen_show(2, "IP:" + result.stdout.strip())
+    except Exception as e:
+        pass
+
+def show_network_mode():
+    try:
+        if OLED_connection:
+            result = subprocess.run(
+                "if iw dev wlan0 link | grep -q 'Connected'; then echo 'Station Mode'; else echo 'AP Mode'; fi",
+                shell=True,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                encoding='utf-8'
+            )
+            screen.screen_show(3, result.stdout.strip())
+    except Exception as e:
+        pass
+
 if __name__ == '__main__':
     switch.switchSetup()
     switch.set_all_switch_off()
+
+    show_wlan0_ip()
+    time.sleep(0.5)
+    show_network_mode()
 
     global flask_app
     flask_app = app.webapp()
@@ -533,7 +508,6 @@ if __name__ == '__main__':
         pass
 
     while  1:
-        wifi_check()
         try:                  #Start server,waiting for client
             start_server = websockets.serve(main_logic, '0.0.0.0', 8888)
             asyncio.get_event_loop().run_until_complete(start_server)

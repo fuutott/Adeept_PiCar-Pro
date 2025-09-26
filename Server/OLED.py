@@ -17,9 +17,9 @@ except:
 	print('OLED disconnected\n')
 
 
-text_1 = 'GEWBOT.COM'
+text_1 = 'Adeept.COM'
 text_2 = 'IP:CONNECTING'
-text_3 = '<ARM> OR <PT> MODE'
+text_3 = 'Network Mode'
 text_4 = 'MPU6050 DETECTING'
 text_5 = 'FUNCTION OFF'
 text_6 = 'Message:None'
