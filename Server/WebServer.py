@@ -89,9 +89,6 @@ def replace_num(initial,new_num):   #Call this function to replace data in '.txt
     with open(thisPath+"/RPIservo.py","w") as f:
         f.writelines(newline)
 
-def ap_thread():
-    os.system("sudo create_ap wlan0 eth0 Adeept_Robot 12345678")
-
 
 def functionSelect(command_input, response):
     if 'scan' == command_input:

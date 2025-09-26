@@ -108,10 +108,6 @@ def FPV_thread():
     fpv.capture_thread(addr[0])
 
 
-def ap_thread():
-    os.system("sudo create_ap wlan0 eth0 Adeept_Robot 12345678")
-
-
 def functionSelect(command_input, response):
     global functionMode
     if 'scan' == command_input:
