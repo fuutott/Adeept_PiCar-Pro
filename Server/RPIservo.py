@@ -50,7 +50,6 @@ class ServoCtrl(threading.Thread):
         self.scDelay = 0.09
         self.scMoveTime = 0.09
         
-
         self.goalUpdate = 0
         self.wiggleID = 0
         self.wiggleDirection = 1
