@@ -113,7 +113,8 @@ commands_pip_1 = [
 "sudo pip3 install pyzmq",
 "sudo pip3 install imutils zmq pybase64 psutil",
 "sudo pip3 install websockets==13.0",
-"sudo pip3 install adafruit-circuitpython-ads7830"
+"sudo pip3 install adafruit-circuitpython-ads7830",
+"sudo pip3 install 'mcp[cli]>=1.6.0'"
 ]
 commands_pip_2 = [
 "sudo pip3 install adafruit-circuitpython-motor --break-system-packages",
@@ -129,7 +130,8 @@ commands_pip_2 = [
 "sudo pip3 install pyzmq --break-system-packages",
 "sudo pip3 install imutils zmq pybase64 psutil --break-system-packages",
 "sudo pip3 install websockets==13.0 --break-system-packages",
-"sudo pip3 install adafruit-circuitpython-ads7830 --break-system-packages"
+"sudo pip3 install adafruit-circuitpython-ads7830 --break-system-packages",
+"sudo pip3 install 'mcp[cli]>=1.6.0' --break-system-packages"
 ]
 mark_pip = 0
 OS_version = check_raspbain_version()
