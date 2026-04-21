@@ -2,6 +2,22 @@
 Adeept PiCar-Pro is an open source intelligent robotics product for artificial intelligence, robotics enthusiasts and students. This product is based on the Raspberry Pi motherboard using the python language and is compatible with the following Raspberry Pi models: 3B,3B+,4,5, etc.
 
 
+## Driving the robot from Claude Code via MCP
+
+This fork adds a fourth server entry point, `Server/MCPServer.py`, that exposes
+the robot over [Model Context Protocol](https://modelcontextprotocol.io) on
+port 8765. It lets Claude Code (or any MCP client) drive the car as a set of
+tools — movement, arm / pan-tilt / gripper, sensors, camera snapshot and
+filmstrip, lights, OLED, buzzer, servo trim calibration, and composed
+autonomy (radar scan, obstacle avoid, line track, keep distance,
+emergency stop).
+
+It's mutually exclusive with `WebServer.py` / `APPServer.py` / `GUIServer.py`
+(they all bind the same PCA9685, GPIO and camera). See
+[README_MCP.md](README_MCP.md) for install, run, Claude Code `.mcp.json`
+snippet, tool list and the calibration workflow.
+
+
 ## Resources Links
 
 [RobotName]: Adeept PiCar-Pro \
